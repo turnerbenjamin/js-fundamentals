@@ -6,7 +6,7 @@ export const characterSetPaths = {
   letterLetter: `C:\\Users\\Ben\\Desktop\\Courses\\Digital Futures\\js-fundamentals\\src\\utils\\character_set2.txt`,
 };
 
-export async function getCharacterSet(textFilePath) {
+export async function getCharacterSet(textFilePath, padding) {
   const charSet1TxtFileLines = await readLines(textFilePath);
-  return new CharacterSet(charSet1TxtFileLines);
+  return new CharacterSet(charSet1TxtFileLines, padding);
 }

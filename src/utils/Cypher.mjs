@@ -1,24 +1,33 @@
 export default class Cypher {
   #characterSet;
-  constructor(charMap, options) {
+  constructor(charMap) {
     this.#characterSet = charMap;
-    this._padToLength = options?.padding?.length;
-    this._paddingCharacter = options?.padding?.character || "?";
   }
 
-  encrypt(str, key) {
+  #encryptChar(character, key) {
+    if (!key) return this.#characterSet.getValueByCharacter(character);
+    const baseIndex = this.#characterSet.getIndexByCharacter(character);
+    if (baseIndex === undefined) return "";
+    const encryptedCharIndex = (baseIndex + key) % this.#characterSet.count;
+    return this.#characterSet.getValueByIndex(encryptedCharIndex);
+  }
+
+  #decryptChar(encryptedChar, key) {
+    if (!key) return this.#characterSet.getCharacterByValue(encryptedChar);
+    const baseIndex = this.#characterSet.getIndexByValue(encryptedChar);
+    if (baseIndex === undefined) return "";
+    const decryptedCharIndex =
+      (((baseIndex - key) % this.#characterSet.count) +
+        this.#characterSet.count) %
+      this.#characterSet.count;
+    return this.#characterSet.getCharacterByIndex(decryptedCharIndex);
+  }
+
+  encrypt(str, key = 0) {
     let encryptedText = "";
     for (let i = 0; i < str.length; i++) {
       const character = str[i];
-      let encryptedChar = this.#characterSet.getValueByCharacter(character);
-
-      if (key !== undefined) encryptedChar = `${(+encryptedChar + key) % 100}`;
-
-      if (this._padToLength)
-        encryptedChar = encryptedChar.padStart(
-          this._padToLength,
-          this._paddingCharacter
-        );
+      let encryptedChar = this.#encryptChar(character, key);
       encryptedText += encryptedChar;
     }
     return encryptedText;
@@ -26,14 +35,9 @@ export default class Cypher {
 
   decrypt(str, key) {
     let plainText = "";
-    for (let i = 0; i < str.length; i += this._padToLength ?? 1) {
-      let encryptedChar = str.slice(i, i + (this._padToLength || 1));
-
-      if (key) encryptedChar = (((+encryptedChar - key) % 100) + 100) % 100;
-
-      const decryptedChar = this.#characterSet.getCharacterByValue(
-        `${encryptedChar}`
-      );
+    for (let i = 0; i < str.length; i += this.#characterSet.padding ?? 1) {
+      let encryptedChar = str.slice(i, i + (this.#characterSet.padding || 1));
+      const decryptedChar = this.#decryptChar(encryptedChar, key);
       plainText += decryptedChar;
     }
 

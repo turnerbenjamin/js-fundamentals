@@ -6,13 +6,14 @@ import Cypher from "./utils/Cypher.mjs";
 
 //Get character Set
 const letterNumberCharacterSet = await getCharacterSet(
-  characterSetPaths.letterNumber
+  characterSetPaths.letterNumber,
+  {
+    padding: { length: 2, character: "0" },
+  }
 );
 
 //Initialise Cypher
-const letterNumberCypher = new Cypher(letterNumberCharacterSet, {
-  padding: { length: 2, character: "0" },
-});
+const letterNumberCypher = new Cypher(letterNumberCharacterSet);
 
 //Run Tests
 
@@ -21,7 +22,7 @@ const tests = [
   { plainText: "Ed", key: 4 },
   { plainText: "Hi, Ed!", key: 302 },
 ];
-const expectedResults = ["03", "3609", "37128003340756"];
+const expectedResults = ["03", "3609", "46218912431665"];
 
 tests.forEach((test, i) => {
   const expectedResult = expectedResults[i];
